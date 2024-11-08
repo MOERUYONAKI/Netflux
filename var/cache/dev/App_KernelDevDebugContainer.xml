@@ -58,6 +58,11 @@
       <parameter key="Symfony\Component\Console\Event\ConsoleErrorEvent">console.error</parameter>
       <parameter key="Symfony\Component\Console\Event\ConsoleSignalEvent">console.signal</parameter>
       <parameter key="Symfony\Component\Console\Event\ConsoleTerminateEvent">console.terminate</parameter>
+      <parameter key="Symfony\Component\Form\Event\PreSubmitEvent">form.pre_submit</parameter>
+      <parameter key="Symfony\Component\Form\Event\SubmitEvent">form.submit</parameter>
+      <parameter key="Symfony\Component\Form\Event\PostSubmitEvent">form.post_submit</parameter>
+      <parameter key="Symfony\Component\Form\Event\PreSetDataEvent">form.pre_set_data</parameter>
+      <parameter key="Symfony\Component\Form\Event\PostSetDataEvent">form.post_set_data</parameter>
       <parameter key="Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent">kernel.controller_arguments</parameter>
       <parameter key="Symfony\Component\HttpKernel\Event\ControllerEvent">kernel.controller</parameter>
       <parameter key="Symfony\Component\HttpKernel\Event\ResponseEvent">kernel.response</parameter>
@@ -99,6 +104,8 @@
     </parameter>
     <parameter key="session.save_path">null</parameter>
     <parameter key="session.metadata.update_threshold">0</parameter>
+    <parameter key="form.type_extension.csrf.enabled">false</parameter>
+    <parameter key="validator.translation_domain">validators</parameter>
     <parameter key="data_collector.templates" type="collection"/>
     <parameter key="twig.form.resources" type="collection">
       <parameter>form_div_layout.html.twig</parameter>
@@ -191,6 +198,13 @@
         <argument type="service" id=".service_locator.QaaoWjx.App\Controller\IndexController"/>
       </call>
     </service>
+    <service id="App\Controller\UserController" class="App\Controller\UserController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.QaaoWjx.App\Controller\UserController"/>
+      </call>
+    </service>
     <service id="App\Repository\MovieRepository" class="App\Repository\MovieRepository" autowire="true" autoconfigure="true">
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
@@ -222,7 +236,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.dyzWi7x"/>
+      <argument type="service" id=".service_locator.hqfl_s0"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -345,12 +359,15 @@
         <argument key="debug.stopwatch" type="service" id="debug.stopwatch" on-invalid="ignore_uninitialized"/>
         <argument key="debug.event_dispatcher" type="service" id="debug.event_dispatcher" on-invalid="ignore_uninitialized"/>
         <argument key="session_listener" type="service" id="session_listener" on-invalid="ignore_uninitialized"/>
+        <argument key="form.choice_list_factory.cached" type="service" id="form.choice_list_factory.cached" on-invalid="ignore_uninitialized"/>
         <argument key="twig" type="service" id="twig" on-invalid="ignore_uninitialized"/>
+        <argument key="twig.form.engine" type="service" id="twig.form.engine" on-invalid="ignore_uninitialized"/>
         <argument key="webpack_encore.tag_renderer" type="service" id="webpack_encore.tag_renderer" on-invalid="ignore_uninitialized"/>
         <argument key="cache.webpack_encore" type="service" id="cache.webpack_encore" on-invalid="ignore_uninitialized"/>
         <argument key="webpack_encore.entrypoint_lookup[_default]" type="service" id="webpack_encore.entrypoint_lookup[_default]" on-invalid="ignore_uninitialized"/>
         <argument key="doctrine" type="service" id="doctrine" on-invalid="ignore_uninitialized"/>
         <argument key="doctrine.debug_data_holder" type="service" id="doctrine.debug_data_holder" on-invalid="ignore_uninitialized"/>
+        <argument key="form.type.entity" type="service" id="form.type.entity" on-invalid="ignore_uninitialized"/>
       </argument>
       <argument type="collection">
         <argument key="cache.app" type="collection">
@@ -377,8 +394,14 @@
         <argument key="session_listener" type="collection">
           <argument>reset</argument>
         </argument>
+        <argument key="form.choice_list_factory.cached" type="collection">
+          <argument>reset</argument>
+        </argument>
         <argument key="twig" type="collection">
           <argument>resetGlobals</argument>
+        </argument>
+        <argument key="twig.form.engine" type="collection">
+          <argument>reset</argument>
         </argument>
         <argument key="webpack_encore.tag_renderer" type="collection">
           <argument>reset</argument>
@@ -393,6 +416,9 @@
           <argument>reset</argument>
         </argument>
         <argument key="doctrine.debug_data_holder" type="collection">
+          <argument>reset</argument>
+        </argument>
+        <argument key="form.type.entity" type="collection">
           <argument>reset</argument>
         </argument>
       </argument>
@@ -741,6 +767,38 @@
       </call>
       <call method="setDescription">
         <argument>Lint a YAML file and outputs encountered errors</argument>
+      </call>
+    </service>
+    <service id="console.command.form_debug" class="Symfony\Component\Form\Command\DebugCommand">
+      <tag name="console.command"/>
+      <tag name="container.no_preload"/>
+      <argument type="service" id="form.registry"/>
+      <argument type="collection">
+        <argument>Symfony\Component\Form\Extension\Core\Type</argument>
+        <argument>Symfony\Bridge\Doctrine\Form\Type</argument>
+      </argument>
+      <argument type="collection">
+        <argument>Symfony\Component\Form\Extension\Core\Type\FormType</argument>
+        <argument>Symfony\Component\Form\Extension\Core\Type\ChoiceType</argument>
+        <argument>Symfony\Component\Form\Extension\Core\Type\FileType</argument>
+        <argument>Symfony\Component\Form\Extension\Core\Type\ColorType</argument>
+        <argument>Symfony\Bridge\Doctrine\Form\Type\EntityType</argument>
+      </argument>
+      <argument type="collection">
+        <argument>Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension</argument>
+        <argument>Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension</argument>
+        <argument>Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension</argument>
+        <argument>Symfony\Component\Form\Extension\Validator\Type\SubmitTypeValidatorExtension</argument>
+      </argument>
+      <argument type="collection">
+        <argument>Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser</argument>
+      </argument>
+      <argument type="service" id="debug.file_link_formatter" on-invalid="null"/>
+      <call method="setName">
+        <argument>debug:form</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Display form type information</argument>
       </call>
     </service>
     <service id="console.command.secrets_set" class="Symfony\Bundle\FrameworkBundle\Command\SecretsSetCommand">
@@ -1364,7 +1422,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.dyzWi7x"/>
+      <argument type="service" id=".service_locator.hqfl_s0"/>
     </service>
     <service id="routing.resolver" class="Symfony\Component\Config\Loader\LoaderResolver">
       <call method="addLoader">
@@ -1516,6 +1574,13 @@
     <service id="Symfony\Bundle\FrameworkBundle\Controller\TemplateController" class="Symfony\Bundle\FrameworkBundle\Controller\TemplateController" public="true">
       <argument type="service" id="twig" on-invalid="ignore"/>
     </service>
+    <service id="property_accessor" class="Symfony\Component\PropertyAccess\PropertyAccessor">
+      <argument>3</argument>
+      <argument>2</argument>
+      <argument type="service" id="cache.property_access" on-invalid="ignore"/>
+      <argument type="service" id="property_info.reflection_extractor" on-invalid="null"/>
+      <argument type="service" id="property_info.reflection_extractor" on-invalid="null"/>
+    </service>
     <service id="secrets.vault" class="Symfony\Bundle\FrameworkBundle\Secrets\SodiumVault">
       <argument>C:\TP_symfony\Netflux/config/secrets/%env(default:kernel.environment:APP_RUNTIME_ENV)%</argument>
       <argument type="service" id="secrets.decryption_key" on-invalid="ignore"/>
@@ -1531,6 +1596,51 @@
     <service id="secrets.local_vault" class="Symfony\Bundle\FrameworkBundle\Secrets\DotenvVault">
       <argument>C:\TP_symfony\Netflux/.env.dev.local</argument>
     </service>
+    <service id="type_info.type_context_factory" class="Symfony\Component\TypeInfo\TypeContext\TypeContextFactory">
+      <argument>null</argument>
+    </service>
+    <service id="type_info.resolver" class="Symfony\Component\TypeInfo\TypeResolver\TypeResolver">
+      <argument type="service" id=".service_locator.PZ0UHmb"/>
+    </service>
+    <service id="type_info.resolver.reflection_type" class="Symfony\Component\TypeInfo\TypeResolver\ReflectionTypeResolver">
+      <argument type="service" id="type_info.type_context_factory"/>
+    </service>
+    <service id="type_info.resolver.reflection_parameter" class="Symfony\Component\TypeInfo\TypeResolver\ReflectionParameterTypeResolver">
+      <argument type="service" id="type_info.resolver.reflection_type"/>
+      <argument type="service" id="type_info.type_context_factory"/>
+    </service>
+    <service id="type_info.resolver.reflection_property" class="Symfony\Component\TypeInfo\TypeResolver\ReflectionPropertyTypeResolver">
+      <argument type="service" id="type_info.resolver.reflection_type"/>
+      <argument type="service" id="type_info.type_context_factory"/>
+    </service>
+    <service id="type_info.resolver.reflection_return" class="Symfony\Component\TypeInfo\TypeResolver\ReflectionReturnTypeResolver">
+      <argument type="service" id="type_info.resolver.reflection_type"/>
+      <argument type="service" id="type_info.type_context_factory"/>
+    </service>
+    <service id="property_info" class="Symfony\Component\PropertyInfo\PropertyInfoExtractor">
+      <argument type="iterator">
+        <argument type="service" id="property_info.reflection_extractor"/>
+        <argument type="service" id="doctrine.orm.default_entity_manager.property_info_extractor"/>
+      </argument>
+      <argument type="iterator">
+        <argument type="service" id="doctrine.orm.default_entity_manager.property_info_extractor"/>
+        <argument type="service" id="property_info.reflection_extractor"/>
+      </argument>
+      <argument type="iterator"/>
+      <argument type="iterator">
+        <argument type="service" id="doctrine.orm.default_entity_manager.property_info_extractor"/>
+        <argument type="service" id="property_info.reflection_extractor"/>
+      </argument>
+      <argument type="iterator">
+        <argument type="service" id="property_info.reflection_extractor"/>
+      </argument>
+    </service>
+    <service id="property_info.reflection_extractor" class="Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor">
+      <tag name="property_info.list_extractor" priority="-1000"/>
+      <tag name="property_info.type_extractor" priority="-1002"/>
+      <tag name="property_info.access_extractor" priority="-1000"/>
+      <tag name="property_info.initializable_extractor" priority="-1000"/>
+    </service>
     <service id=".cache_connection.MfCypIA" class="Symfony\Component\Cache\Adapter\AbstractAdapter" constructor="createConnection">
       <argument>redis://localhost</argument>
       <argument type="collection">
@@ -1542,6 +1652,10 @@
       <argument type="collection">
         <argument key="lazy">true</argument>
       </argument>
+    </service>
+    <service id="cache.property_access" class="Symfony\Component\Cache\Adapter\ArrayAdapter">
+      <argument>0</argument>
+      <argument>false</argument>
     </service>
     <service id="session.factory" class="Symfony\Component\HttpFoundation\Session\SessionFactory">
       <argument type="service" id="request_stack"/>
@@ -1609,6 +1723,80 @@
       <argument>%session.storage.options%</argument>
     </service>
     <service id="session.marshaller" class="Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller"/>
+    <service id="form.resolved_type_factory" class="Symfony\Component\Form\ResolvedFormTypeFactory"/>
+    <service id="form.registry" class="Symfony\Component\Form\FormRegistry">
+      <argument type="collection">
+        <argument type="service" id="form.extension"/>
+      </argument>
+      <argument type="service" id="form.resolved_type_factory"/>
+    </service>
+    <service id="form.factory" class="Symfony\Component\Form\FormFactory">
+      <argument type="service" id="form.registry"/>
+    </service>
+    <service id="form.extension" class="Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension">
+      <argument type="service" id=".service_locator.9QYCuGc"/>
+      <argument type="collection">
+        <argument key="Symfony\Component\Form\Extension\Core\Type\FormType" type="iterator">
+          <argument type="service" id="form.type_extension.form.transformation_failure_handling"/>
+          <argument type="service" id="form.type_extension.form.http_foundation"/>
+        </argument>
+        <argument key="Symfony\Component\Form\Extension\Core\Type\RepeatedType" type="iterator">
+          <argument type="service" id="form.type_extension.repeated.validator"/>
+        </argument>
+        <argument key="Symfony\Component\Form\Extension\Core\Type\SubmitType" type="iterator">
+          <argument type="service" id="form.type_extension.submit.validator"/>
+        </argument>
+      </argument>
+      <argument type="iterator">
+        <argument type="service" id="form.type_guesser.doctrine"/>
+      </argument>
+    </service>
+    <service id="form.choice_list_factory.default" class="Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory"/>
+    <service id="form.choice_list_factory.property_access" class="Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator">
+      <argument type="service" id="form.choice_list_factory.default"/>
+      <argument type="service" id="property_accessor"/>
+    </service>
+    <service id="form.choice_list_factory.cached" class="Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator">
+      <tag name="kernel.reset" method="reset"/>
+      <argument type="service" id="form.choice_list_factory.property_access"/>
+    </service>
+    <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType">
+      <tag name="form.type"/>
+      <argument type="service" id="property_accessor"/>
+    </service>
+    <service id="form.type.choice" class="Symfony\Component\Form\Extension\Core\Type\ChoiceType">
+      <tag name="form.type"/>
+      <argument type="service" id="form.choice_list_factory.cached"/>
+      <argument>null</argument>
+    </service>
+    <service id="form.type.file" class="Symfony\Component\Form\Extension\Core\Type\FileType">
+      <tag name="form.type"/>
+      <argument>null</argument>
+    </service>
+    <service id="form.type.color" class="Symfony\Component\Form\Extension\Core\Type\ColorType">
+      <tag name="form.type"/>
+      <argument>null</argument>
+    </service>
+    <service id="form.type_extension.form.transformation_failure_handling" class="Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension">
+      <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType"/>
+      <argument>null</argument>
+    </service>
+    <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
+      <tag name="form.type_extension"/>
+      <argument type="service" id="form.type_extension.form.request_handler"/>
+    </service>
+    <service id="form.type_extension.form.request_handler" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler">
+      <argument type="service" id="form.server_params"/>
+    </service>
+    <service id="form.server_params" class="Symfony\Component\Form\Util\ServerParams">
+      <argument type="service" id="request_stack"/>
+    </service>
+    <service id="form.type_extension.repeated.validator" class="Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension">
+      <tag name="form.type_extension"/>
+    </service>
+    <service id="form.type_extension.submit.validator" class="Symfony\Component\Form\Extension\Validator\Type\SubmitTypeValidatorExtension">
+      <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\SubmitType"/>
+    </service>
     <service id="twig" class="Twig\Environment">
       <tag name="container.preload" class="Twig\Cache\FilesystemCache"/>
       <tag name="container.preload" class="Twig\Extension\CoreExtension"/>
@@ -1650,6 +1838,9 @@
       </call>
       <call method="addExtension">
         <argument type="service" id="twig.extension.httpfoundation"/>
+      </call>
+      <call method="addExtension">
+        <argument type="service" id="twig.extension.form"/>
       </call>
       <call method="addExtension">
         <argument type="service" id="twig.extension.debug"/>
@@ -1703,7 +1894,9 @@
     </service>
     <service id="twig.template_iterator" class="Symfony\Bundle\TwigBundle\TemplateIterator">
       <argument type="service" id="kernel"/>
-      <argument type="collection"/>
+      <argument type="collection">
+        <argument key="C:\TP_symfony\Netflux\vendor\symfony\twig-bridge/Resources/views/Form">null</argument>
+      </argument>
       <argument>C:\TP_symfony\Netflux/templates</argument>
       <argument type="collection">
         <argument>*.twig</argument>
@@ -1737,6 +1930,9 @@
       </call>
       <call method="addPath">
         <argument>C:\TP_symfony\Netflux/templates</argument>
+      </call>
+      <call method="addPath">
+        <argument>C:\TP_symfony\Netflux\vendor\symfony\twig-bridge/Resources/views/Form</argument>
       </call>
     </service>
     <service id="twig.loader.chain" class="Twig\Loader\ChainLoader"/>
@@ -1801,7 +1997,7 @@
       <argument>,</argument>
     </service>
     <service id="twig.runtime_loader" class="Twig\RuntimeLoader\ContainerRuntimeLoader">
-      <argument type="service" id=".service_locator.7YSb91X"/>
+      <argument type="service" id=".service_locator.QSoHvSv"/>
     </service>
     <service id="twig.error_renderer.html" class="Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer">
       <argument type="service" id="twig"/>
@@ -1821,6 +2017,20 @@
     <service id="controller.template_attribute_listener" class="Symfony\Bridge\Twig\EventListener\TemplateAttributeListener">
       <tag name="kernel.event_subscriber"/>
       <argument type="service" id="twig"/>
+    </service>
+    <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension">
+      <tag name="twig.extension"/>
+      <argument>null</argument>
+    </service>
+    <service id="twig.form.engine" class="Symfony\Bridge\Twig\Form\TwigRendererEngine">
+      <tag name="kernel.reset" method="reset"/>
+      <argument>%twig.form.resources%</argument>
+      <argument type="service" id="twig"/>
+    </service>
+    <service id="twig.form.renderer" class="Symfony\Component\Form\FormRenderer">
+      <tag name="twig.runtime"/>
+      <argument type="service" id="twig.form.engine"/>
+      <argument>null</argument>
     </service>
     <service id="twig.command.debug" class="Symfony\Bridge\Twig\Command\DebugCommand">
       <tag name="console.command"/>
@@ -2125,6 +2335,7 @@
     </service>
     <service id="form.type.entity" class="Symfony\Bridge\Doctrine\Form\Type\EntityType">
       <tag name="form.type" alias="entity"/>
+      <tag name="kernel.reset" method="reset"/>
       <argument type="service" id="doctrine"/>
     </service>
     <service id="doctrine.orm.configuration" class="Doctrine\ORM\Configuration" abstract="true"/>
@@ -2388,6 +2599,12 @@
       <argument type="service" id="doctrine.orm.default_configuration"/>
       <argument type="service" id="doctrine.dbal.default_connection.event_manager"/>
       <configurator service="doctrine.orm.default_manager_configurator" method="configure"/>
+    </service>
+    <service id="doctrine.orm.default_entity_manager.property_info_extractor" class="Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor">
+      <tag name="property_info.list_extractor" priority="-1001"/>
+      <tag name="property_info.type_extractor" priority="-999"/>
+      <tag name="property_info.access_extractor" priority="-999"/>
+      <argument type="service" id="doctrine.orm.default_entity_manager"/>
     </service>
     <service id="doctrine.migrations.dependency_factory" class="Doctrine\Migrations\DependencyFactory" constructor="fromEntityManager">
       <argument type="service" id="doctrine.migrations.configuration_loader"/>
@@ -2794,6 +3011,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\IndexController" class="App\Controller\IndexController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\IndexController" class="App\Controller\IndexController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\IndexController" class="App\Controller\IndexController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\UserController" class="App\Controller\UserController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\UserController" class="App\Controller\UserController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\UserController" class="App\Controller\UserController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\MovieRepository" class="App\Repository\MovieRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\MovieRepository" class="App\Repository\MovieRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\UserRepository" class="App\Repository\UserRepository" autowire="true" abstract="true"/>
@@ -3234,15 +3454,33 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.4wc4Ag1" method="withContext"/>
     </service>
-    <service id=".service_locator.dyzWi7x" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".errored.w2TAxXv" class="App\Controller\Request">
+      <tag name="container.error" message="Cannot determine controller argument for &quot;App\Controller\UserController::create()&quot;: the $request argument is type-hinted with the non-existent class or interface: &quot;App\Controller\Request&quot;. Did you forget to add a use statement?"/>
+    </service>
+    <service id=".service_locator.nLQNDMr" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="request" type="service_closure" id=".errored.w2TAxXv"/>
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator.nLQNDMr.App\Controller\UserController::create()" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\UserController::create()"/>
+      <argument>App\Controller\UserController::create()</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.nLQNDMr" method="withContext"/>
+    </service>
+    <service id=".service_locator.hqfl_s0" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.4wc4Ag1.kernel::registerContainerConfiguration()"/>
         <argument key="App\Kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.4wc4Ag1.kernel::registerContainerConfiguration()"/>
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.4wc4Ag1.kernel::loadRoutes()"/>
         <argument key="App\Kernel::loadRoutes" type="service_closure" id=".service_locator.4wc4Ag1.kernel::loadRoutes()"/>
+        <argument key="App\Controller\UserController::create" type="service_closure" id=".service_locator.nLQNDMr.App\Controller\UserController::create()"/>
         <argument key="kernel:registerContainerConfiguration" type="service_closure" id=".service_locator.4wc4Ag1.kernel::registerContainerConfiguration()"/>
         <argument key="kernel:loadRoutes" type="service_closure" id=".service_locator.4wc4Ag1.kernel::loadRoutes()"/>
+        <argument key="App\Controller\UserController:create" type="service_closure" id=".service_locator.nLQNDMr.App\Controller\UserController::create()"/>
       </argument>
     </service>
     <service id=".service_locator.va_rxC4" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -3298,6 +3536,16 @@
     <service id=".debug.value_resolver.argument_resolver.query_parameter_value_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\TraceableValueResolver">
       <argument type="service" id="argument_resolver.query_parameter_value_resolver"/>
       <argument type="service" id="debug.stopwatch"/>
+    </service>
+    <service id=".service_locator.9QYCuGc" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="Symfony\Component\Form\Extension\Core\Type\FormType" type="service_closure" id="form.type.form"/>
+        <argument key="Symfony\Component\Form\Extension\Core\Type\ChoiceType" type="service_closure" id="form.type.choice"/>
+        <argument key="Symfony\Component\Form\Extension\Core\Type\FileType" type="service_closure" id="form.type.file"/>
+        <argument key="Symfony\Component\Form\Extension\Core\Type\ColorType" type="service_closure" id="form.type.color"/>
+        <argument key="Symfony\Bridge\Doctrine\Form\Type\EntityType" type="service_closure" id="form.type.entity"/>
+      </argument>
     </service>
     <service id=".service_locator.ZSS2D.Y" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
@@ -3358,12 +3606,19 @@
         <argument key="request_stack" type="service_closure" id="request_stack" on-invalid="ignore"/>
         <argument key="http_kernel" type="service_closure" id="http_kernel" on-invalid="ignore"/>
         <argument key="twig" type="service_closure" id="twig" on-invalid="ignore"/>
+        <argument key="form.factory" type="service_closure" id="form.factory" on-invalid="ignore"/>
         <argument key="parameter_bag" type="service_closure" id="parameter_bag" on-invalid="ignore"/>
       </argument>
     </service>
     <service id=".service_locator.QaaoWjx.App\Controller\IndexController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\IndexController"/>
       <argument>App\Controller\IndexController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.QaaoWjx" method="withContext"/>
+    </service>
+    <service id=".service_locator.QaaoWjx.App\Controller\UserController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\UserController"/>
+      <argument>App\Controller\UserController</argument>
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.QaaoWjx" method="withContext"/>
     </service>
@@ -3448,6 +3703,15 @@
         <argument key="kernel" type="service_closure" id="kernel"/>
       </argument>
     </service>
+    <service id=".service_locator.PZ0UHmb" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="ReflectionType" type="service_closure" id="type_info.resolver.reflection_type"/>
+        <argument key="ReflectionParameter" type="service_closure" id="type_info.resolver.reflection_parameter"/>
+        <argument key="ReflectionProperty" type="service_closure" id="type_info.resolver.reflection_property"/>
+        <argument key="ReflectionFunctionAbstract" type="service_closure" id="type_info.resolver.reflection_return"/>
+      </argument>
+    </service>
     <service id=".service_locator.ECaP3MA" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -3470,6 +3734,7 @@
         <argument type="collection">
           <argument>App\Kernel</argument>
           <argument>App\Controller\IndexController</argument>
+          <argument>App\Controller\UserController</argument>
           <argument>Doctrine\Bundle\DoctrineBundle\Controller\ProfilerController</argument>
         </argument>
       </call>
@@ -3631,6 +3896,13 @@
       <argument>Lint a YAML file and outputs encountered errors</argument>
       <argument>false</argument>
       <argument type="service_closure" id="console.command.yaml_lint"/>
+    </service>
+    <service id=".console.command.form_debug.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>debug:form</argument>
+      <argument type="collection"/>
+      <argument>Display form type information</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="console.command.form_debug"/>
     </service>
     <service id=".console.command.secrets_set.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>secrets:set</argument>
@@ -3982,7 +4254,7 @@
     </service>
     <service id="console.command_loader" class="Symfony\Component\Console\CommandLoader\ContainerCommandLoader" public="true">
       <tag name="container.no_preload"/>
-      <argument type="service" id=".service_locator.AJXbUOl"/>
+      <argument type="service" id=".service_locator.6ctyDT8"/>
       <argument type="collection">
         <argument key="about">console.command.about</argument>
         <argument key="assets:install">console.command.assets_install</argument>
@@ -4003,6 +4275,7 @@
         <argument key="debug:router">console.command.router_debug</argument>
         <argument key="router:match">console.command.router_match</argument>
         <argument key="lint:yaml">console.command.yaml_lint</argument>
+        <argument key="debug:form">console.command.form_debug</argument>
         <argument key="secrets:set">console.command.secrets_set</argument>
         <argument key="secrets:remove">console.command.secrets_remove</argument>
         <argument key="secrets:generate-keys">console.command.secrets_generate_key</argument>
@@ -4073,7 +4346,7 @@
         <argument key="make:webhook">maker.auto_command.make_webhook</argument>
       </argument>
     </service>
-    <service id=".service_locator.AJXbUOl" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.6ctyDT8" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="console.command.about" type="service_closure" id=".console.command.about.lazy"/>
@@ -4095,6 +4368,7 @@
         <argument key="console.command.router_debug" type="service_closure" id=".console.command.router_debug.lazy"/>
         <argument key="console.command.router_match" type="service_closure" id=".console.command.router_match.lazy"/>
         <argument key="console.command.yaml_lint" type="service_closure" id=".console.command.yaml_lint.lazy"/>
+        <argument key="console.command.form_debug" type="service_closure" id=".console.command.form_debug.lazy"/>
         <argument key="console.command.secrets_set" type="service_closure" id=".console.command.secrets_set.lazy"/>
         <argument key="console.command.secrets_remove" type="service_closure" id=".console.command.secrets_remove.lazy"/>
         <argument key="console.command.secrets_generate_key" type="service_closure" id=".console.command.secrets_generate_key.lazy"/>
@@ -4162,10 +4436,11 @@
         <argument key="maker.auto_command.make_webhook" type="service_closure" id=".maker.auto_command.make_webhook.lazy"/>
       </argument>
     </service>
-    <service id=".service_locator.7YSb91X" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.QSoHvSv" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="Symfony\Bridge\Twig\Extension\HttpKernelRuntime" type="service_closure" id="twig.runtime.httpkernel"/>
+        <argument key="Symfony\Component\Form\FormRenderer" type="service_closure" id="twig.form.renderer"/>
       </argument>
     </service>
     <service id="App\Kernel" alias="kernel" public="true"/>
@@ -4202,12 +4477,27 @@
     <service id="Symfony\Component\Routing\Matcher\UrlMatcherInterface" alias="router.default"/>
     <service id="Symfony\Component\Routing\RequestContextAwareInterface" alias="router.default"/>
     <service id="Symfony\Component\Routing\RequestContext" alias="router.request_context"/>
+    <service id="Symfony\Component\PropertyAccess\PropertyAccessorInterface" alias="property_accessor"/>
+    <service id="Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface" alias="type_info.resolver"/>
+    <service id="Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface" alias="property_info"/>
+    <service id="Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface" alias="property_info"/>
+    <service id="Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface" alias="property_info"/>
+    <service id="Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface" alias="property_info"/>
+    <service id="Symfony\Component\PropertyInfo\PropertyListExtractorInterface" alias="property_info"/>
+    <service id="Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface" alias="property_info"/>
+    <service id="Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface" alias="property_info.reflection_extractor"/>
+    <service id="Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface" alias="property_info.reflection_extractor"/>
     <service id="cache.default_redis_provider" alias=".cache_connection.MfCypIA"/>
     <service id="cache.default_memcached_provider" alias=".cache_connection.8kvDmRs"/>
     <service id="cache.default_doctrine_dbal_provider" alias="doctrine.dbal.default_connection"/>
     <service id="SessionHandlerInterface" alias="session.handler.native"/>
     <service id="session.storage.factory" alias="session.storage.factory.native"/>
     <service id="session.handler" alias="session.handler.native"/>
+    <service id="Symfony\Component\Form\ResolvedFormTypeFactoryInterface" alias="form.resolved_type_factory"/>
+    <service id="Symfony\Component\Form\FormRegistryInterface" alias="form.registry"/>
+    <service id="Symfony\Component\Form\FormFactoryInterface" alias="form.factory"/>
+    <service id="form.property_accessor" alias="property_accessor"/>
+    <service id="form.choice_list_factory" alias="form.choice_list_factory.cached"/>
     <service id="Twig\Environment" alias="twig"/>
     <service id="Symfony\WebpackEncoreBundle\Asset\EntrypointLookupCollectionInterface" alias="webpack_encore.entrypoint_lookup_collection"/>
     <service id="Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface" alias="webpack_encore.entrypoint_lookup[_default]"/>
@@ -4227,7 +4517,7 @@
     <service id="doctrine.migrations.metadata_storage" alias="doctrine.migrations.storage.table_storage"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.pRu6x_4" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.dyzWi7x"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.hqfl_s0"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.BxSdgVt"/>
     <service id="Psr\Log\LoggerInterface" alias="logger"/>
@@ -4238,6 +4528,7 @@
     <service id="twig.error_renderer.html.inner" alias="error_handler.error_renderer.html"/>
     <service id="doctrine.orm.default_metadata_driver" alias=".doctrine.orm.default_metadata_driver"/>
     <service id=".service_locator.diNoEIK" alias=".service_locator.4wc4Ag1"/>
-    <service id=".service_locator.YLTSEAJ" alias=".service_locator.QaaoWjx"/>
+    <service id=".service_locator.TizNaWL" alias=".service_locator.nLQNDMr"/>
+    <service id=".service_locator.mI_HcvE" alias=".service_locator.QaaoWjx"/>
   </services>
 </container>
