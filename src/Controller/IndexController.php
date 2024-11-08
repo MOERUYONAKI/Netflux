@@ -2,30 +2,28 @@
 
 namespace App\Controller;
 
+use App\Entity\Movie;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class IndexController extends AbstractController
 {
     #[Route('/', name: 'index')]
-    public function index(): Response
+    public function index(
+        EntityManagerInterface $entityManager
+    ): Response
     {
-        $testFilms = [
-            [
-                "title" => "Astérix et Obélix : L'Empire Du Milieu",
-                "date" => "",
-                "image" => "/medias/L'Empire Du Milieu.jpg",
-                "movie" => ""
-            ],
-        ];
+        $movies = $entityManager->getRepository(Movie::class)->findAll();
 
         return $this->render('Page/index.html.twig', [
-            'films' => $testFilms
+            'films' => $movies
         ]);
     }
 
-    #[Route('/incription', name: 'inscription')]
+    #[Route('/registration', name: 'registration')]
     public function inscription(): Response
     {
         return $this->render('Page/index.html.twig');
@@ -38,8 +36,15 @@ class IndexController extends AbstractController
     }
 
     #[Route('/watch/{id}', name: 'watch')]
-    public function watch(): Response
+    public function watch(
+        EntityManagerInterface $entityManager,
+        int $id
+    ): Response
     {
-        return $this->render('Page/index.html.twig');
+        $movie = $entityManager->getRepository(Movie::class)->find($id);
+
+        return $this->render('Page/watch.html.twig', [
+            'film' => $movie
+        ]);
     }
 }
