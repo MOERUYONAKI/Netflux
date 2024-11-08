@@ -18,6 +18,7 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
         'ffecb95d45175fd40f75be8a23b34f90' => __DIR__ . '/..' . '/twig/twig/src/Resources/debug.php',
         'c7baa00073ee9c61edf148c51917cfb4' => __DIR__ . '/..' . '/twig/twig/src/Resources/escaper.php',
         'f844ccf1d25df8663951193c3fc307c8' => __DIR__ . '/..' . '/twig/twig/src/Resources/string_loader.php',
+        '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
         '6a47392539ca2329373e0d33e1dba053' => __DIR__ . '/..' . '/symfony/polyfill-intl-icu/bootstrap.php',
     );
 
@@ -44,14 +45,19 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
             'Symfony\\Component\\Yaml\\' => 23,
             'Symfony\\Component\\VarExporter\\' => 30,
             'Symfony\\Component\\VarDumper\\' => 28,
+            'Symfony\\Component\\Validator\\' => 28,
             'Symfony\\Component\\TypeInfo\\' => 27,
             'Symfony\\Component\\String\\' => 25,
             'Symfony\\Component\\Stopwatch\\' => 28,
+            'Symfony\\Component\\Security\\Http\\' => 32,
+            'Symfony\\Component\\Security\\Csrf\\' => 32,
+            'Symfony\\Component\\Security\\Core\\' => 32,
             'Symfony\\Component\\Runtime\\' => 26,
             'Symfony\\Component\\Routing\\' => 26,
             'Symfony\\Component\\PropertyInfo\\' => 31,
             'Symfony\\Component\\PropertyAccess\\' => 33,
             'Symfony\\Component\\Process\\' => 26,
+            'Symfony\\Component\\PasswordHasher\\' => 33,
             'Symfony\\Component\\OptionsResolver\\' => 34,
             'Symfony\\Component\\HttpKernel\\' => 29,
             'Symfony\\Component\\HttpFoundation\\' => 33,
@@ -64,12 +70,16 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
             'Symfony\\Component\\DependencyInjection\\' => 38,
             'Symfony\\Component\\Console\\' => 26,
             'Symfony\\Component\\Config\\' => 25,
+            'Symfony\\Component\\Clock\\' => 24,
             'Symfony\\Component\\Cache\\' => 24,
             'Symfony\\Component\\Asset\\' => 24,
             'Symfony\\Bundle\\TwigBundle\\' => 26,
+            'Symfony\\Bundle\\SecurityBundle\\' => 30,
+            'Symfony\\Bundle\\MonologBundle\\' => 29,
             'Symfony\\Bundle\\MakerBundle\\' => 27,
             'Symfony\\Bundle\\FrameworkBundle\\' => 31,
             'Symfony\\Bridge\\Twig\\' => 20,
+            'Symfony\\Bridge\\Monolog\\' => 23,
             'Symfony\\Bridge\\Doctrine\\' => 24,
         ),
         'P' => 
@@ -77,8 +87,13 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
             'Psr\\Log\\' => 8,
             'Psr\\EventDispatcher\\' => 20,
             'Psr\\Container\\' => 14,
+            'Psr\\Clock\\' => 10,
             'Psr\\Cache\\' => 10,
             'PhpParser\\' => 10,
+        ),
+        'M' => 
+        array (
+            'Monolog\\' => 8,
         ),
         'D' => 
         array (
@@ -173,6 +188,10 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
         array (
             0 => __DIR__ . '/..' . '/symfony/var-dumper',
         ),
+        'Symfony\\Component\\Validator\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/validator',
+        ),
         'Symfony\\Component\\TypeInfo\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/type-info',
@@ -184,6 +203,18 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
         'Symfony\\Component\\Stopwatch\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/stopwatch',
+        ),
+        'Symfony\\Component\\Security\\Http\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/security-http',
+        ),
+        'Symfony\\Component\\Security\\Csrf\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/security-csrf',
+        ),
+        'Symfony\\Component\\Security\\Core\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/security-core',
         ),
         'Symfony\\Component\\Runtime\\' => 
         array (
@@ -204,6 +235,10 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
         'Symfony\\Component\\Process\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/process',
+        ),
+        'Symfony\\Component\\PasswordHasher\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/password-hasher',
         ),
         'Symfony\\Component\\OptionsResolver\\' => 
         array (
@@ -253,6 +288,10 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
         array (
             0 => __DIR__ . '/..' . '/symfony/config',
         ),
+        'Symfony\\Component\\Clock\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/clock',
+        ),
         'Symfony\\Component\\Cache\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/cache',
@@ -265,6 +304,14 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
         array (
             0 => __DIR__ . '/..' . '/symfony/twig-bundle',
         ),
+        'Symfony\\Bundle\\SecurityBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/security-bundle',
+        ),
+        'Symfony\\Bundle\\MonologBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/monolog-bundle',
+        ),
         'Symfony\\Bundle\\MakerBundle\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/maker-bundle/src',
@@ -276,6 +323,10 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
         'Symfony\\Bridge\\Twig\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/twig-bridge',
+        ),
+        'Symfony\\Bridge\\Monolog\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/monolog-bridge',
         ),
         'Symfony\\Bridge\\Doctrine\\' => 
         array (
@@ -293,6 +344,10 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
         ),
+        'Psr\\Clock\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/clock/src',
+        ),
         'Psr\\Cache\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/cache/src',
@@ -300,6 +355,10 @@ class ComposerStaticInit9bd74d1d19d86f5d1eb29485bfe41bb7
         'PhpParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
+        ),
+        'Monolog\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
         'Doctrine\\SqlFormatter\\' => 
         array (
