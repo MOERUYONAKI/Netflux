@@ -34,17 +34,8 @@ class IndexController extends AbstractController
                 'admin' => $admin
             ]);
         } else {
-            return $this->redirectToRoute('signin');
+            return $this->redirectToRoute('app_register');
         }
-    }
-
-    #[Route('/signin', name: 'signin')]
-    public function inscription(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        Session $session): Response
-    {
-        return $this->render('Page/signin.html.twig');
     }
 
     #[Route('/signout', name: 'signout')]
@@ -57,7 +48,7 @@ class IndexController extends AbstractController
             $session->remove('user');
         }
 
-        return $this->redirectToRoute('signin');
+        return $this->redirectToRoute('app_register');
     }
 
     #[Route('/new', name: 'add')]
@@ -90,8 +81,7 @@ class IndexController extends AbstractController
                 'film' => $movie
             ]);
         } else {
-            return $this->redirectToRoute('signin');
+            return $this->redirectToRoute('app_register');
         }
-
     }
 }

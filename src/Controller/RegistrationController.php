@@ -17,11 +17,11 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class RegistrationController extends AbstractController
 {
-    public function __construct(private EmailVerifier $emailVerifier)
+    public function __construct(private readonly EmailVerifier $emailVerifier)
     {
     }
 
-    #[Route('/register', name: 'app_register')]
+    #[Route('/signin', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
@@ -44,7 +44,7 @@ class RegistrationController extends AbstractController
                     ->from(new Address('mailer@moeru.com', 'Netflux Bot'))
                     ->to((string) $user->getEmail())
                     ->subject('Please Confirm your Email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
+                    ->htmlTemplate('Registration/confirmation_email.html.twig')
             );
 
             // do anything else you need here, like send an email
@@ -52,7 +52,7 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('index');
         }
 
-        return $this->render('registration/register.html.twig', [
+        return $this->render('Registration/signin.html.twig', [
             'registrationForm' => $form,
         ]);
     }
