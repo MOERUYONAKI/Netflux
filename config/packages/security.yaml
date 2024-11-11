@@ -40,7 +40,8 @@ security:
         - { path: '^/', roles: 'ROLE_USER' }
         - { path: '^/login', roles: 'PUBLIC_ACCESS' }
         - { path: '^/signin', roles: 'PUBLIC_ACCESS' }
-        - { path: '^/signout', roles: 'PUBLIC_ACCESS' }
+        - { path: '^/logout', roles: 'PUBLIC_ACCESS' }
+        - { path: '^/verify/email', roles: 'PUBLIC_ACCESS' }
 
 when@test:
     security:
