@@ -44,9 +44,9 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $session->set('user', $user->getId());
+            $session->set('user', $user);
 
-            // generate a signed url and email it to the user
+//            // generate a signed url and email it to the user
 //            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
 //                (new TemplatedEmail())
 //                    ->from(new Address('mailer@moeru.com', 'Netflux Bot'))
