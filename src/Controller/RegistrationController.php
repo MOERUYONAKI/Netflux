@@ -24,18 +24,35 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/login', name: 'login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response {
-        if ($this->getUser()) {
-            return $this->redirectToRoute('index');
+    public function login(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        // Si le formulaire est soumis
+        if ($request->isMethod('POST')) {
+            $email = $request->request->get('email');
+            $password = $request->request->get('password');
+
+            // cherche l'utilisateur par email
+            $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+
+            // je vérifie si l'utilisateur existe et si le mot de passe est correct
+            if ($user && $passwordHasher->isPasswordValid($user, $password)) {
+                // stockage de l'utilisateur en session
+                $session = $request->getSession();
+                $session->set('user', $user);
+
+                // redirection
+                return $this->redirectToRoute('index');
+            }
+
+            // error d'authentification
+            $error = 'Email ou mot de passe invalide';
+            return $this->render('Registration/signin.html.twig', [
+                'error' => $error
+            ]);
         }
 
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
-
-        return $this->render('Registration/signin.html.twig', [
-            'last_username' => $lastUsername,
-            'error' => $error
-        ]);
+        // formulaire de connexion
+        return $this->render('Registration/signin.html.twig');
     }
 
 
