@@ -14,12 +14,66 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class RegistrationController extends AbstractController
 {
     public function __construct(private readonly EmailVerifier $emailVerifier)
     {
+    }
+
+    #[Route('/login', name: 'login')]
+    public function login(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        // on vérifie si le user est déjà connecté
+        if ($request->getSession()->get('user')) {
+            return $this->redirectToRoute('index');
+        }
+
+        $error = null;
+        $lastUsername = '';
+
+        // on regarde la soumission du formulaire
+        if ($request->isMethod('POST')) {
+            $email = $request->request->get('_username');
+            $password = $request->request->get('_password');
+            $lastUsername = $email;
+
+            // on cherche l'utilisateur par email
+            $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+
+            // je vérifie si l'utilisateur existe et si le mot de passe est correct
+            if ($user && $passwordHasher->isPasswordValid($user, $password)) {
+                // stockage du user en session
+                $session = $request->getSession();
+                $session->set('user', $user);
+
+                // redirect vers la page d'accueil
+                return $this->redirectToRoute('index');
+            }
+
+            // authentification error
+            $error = ['messageKey' => 'Invalid credentials', 'messageData' => []];
+        }
+
+        return $this->render('Registration/login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error
+        ]);
+    }
+
+    #[Route('/logout', name: 'logout')]
+    public function connexion(
+        Session $session
+    ): Response
+    {
+        if($session->has('user'))
+        {
+            $session->remove('user');
+        }
+
+        return $this->redirectToRoute('app_register');
     }
 
     #[Route('/signin', name: 'app_register')]
@@ -46,14 +100,14 @@ class RegistrationController extends AbstractController
 
             $session->set('user', $user);
 
-//            // generate a signed url and email it to the user
-//            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-//                (new TemplatedEmail())
-//                    ->from(new Address('mailer@moeru.com', 'Netflux Bot'))
-//                    ->to((string) $user->getEmail())
-//                    ->subject('Please Confirm your Email')
-//                    ->htmlTemplate('Registration/confirmation_email.html.twig')
-//            );
+            // generate a signed url and email it to the user
+            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+                (new TemplatedEmail())
+                    ->from(new Address('mailer@moeru.com', 'Netflux Bot'))
+                    ->to((string) $user->getEmail())
+                    ->subject('Please Confirm your Email')
+                    ->htmlTemplate('Registration/confirmation_email.html.twig')
+            );
 
             return $this->redirectToRoute('index');
         }

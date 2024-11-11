@@ -35,8 +35,11 @@
                 <button type="submit" class="btn btn-outline-danger">Sign in</button>
             </div>
 
-            {{ form_end(registrationForm) }}
+            <div class="mb-3">
+                <a href="{{ path("login") }}"><small>Already registered</small></a>
+            </div>
 
+            {{ form_end(registrationForm) }}
         </div>
     </div>
 {% endblock body %}

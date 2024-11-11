@@ -8,6 +8,7 @@ use App\Form\MovieType;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -41,19 +42,6 @@ class IndexController extends AbstractController
         }
     }
 
-    #[Route('/signout', name: 'signout')]
-    public function connexion(
-        Session $session
-    ): Response
-    {
-        if($session->has('user'))
-        {
-            $session->remove('user');
-        }
-
-        return $this->redirectToRoute('app_register');
-    }
-
     /**
      * @throws Exception
      */
@@ -62,10 +50,13 @@ class IndexController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         Session $session,
-        SluggerInterface $slugger
+        SluggerInterface $slugger,
+        #[Autowire('%kernel.project_dir%/public/medias')] string $mediasFile
     ): Response
     {
-        if($session->has('user') && $session->get('user')->isAdmin())
+        $user = $entityManager->getRepository(User::class)->find($session->get('user')->getId());
+
+        if($session->has('user') && in_array("ROLE_ADMIN", $user->getRoles()))
         {
             $movie = new Movie();
 
@@ -76,34 +67,31 @@ class IndexController extends AbstractController
                 $posterFile = $form->get('poster')->getData();
                 $movieFile = $form->get('movie')->getData();
 
-                if ($posterFile) {
+                if ($posterFile && $movieFile) {
                     $originalFilename = pathinfo($posterFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    $safeFilename = $slugger->slug($originalFilename);
-                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $posterFile->guessExtension();
+                    $safeFilenamePoster = $slugger->slug($originalFilename);
+                    $newFilenamePoster = $safeFilenamePoster . '-' . uniqid() . '.' . $posterFile->guessExtension();
 
                     $posterFile->move(
-                        $this->getParameter('medias_directory'),
-                        $newFilename
+                        $mediasFile,
+                        $newFilenamePoster
                     );
 
-                    $movie->setImagePath($newFilename);
-                }
-
-                if ($movieFile) {
-                    if (!in_array($movieFile->guessExtension(), ['mp4'])) {
+                    if ($movieFile->guessExtension() != 'mp4') {
                         throw new Exception('Invalid file type.');
                     }
 
-                    $originalFilename = pathinfo($posterFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    $safeFilename = $slugger->slug($originalFilename);
-                    $newFilename = $safeFilename.'-'.uniqid().'.'.$posterFile->guessExtension();
+                    $originalFilename = pathinfo($movieFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilenameMovie = $slugger->slug($originalFilename);
+                    $newFilenameMovie = $safeFilenameMovie.'-'.uniqid().'.'.$movieFile->guessExtension();
 
-                    $posterFile->move(
-                        $this->getParameter('medias_directory'),
-                        $newFilename
+                    $movieFile->move(
+                        $mediasFile,
+                        $newFilenameMovie
                     );
 
-                    $movie->setPath($newFilename);
+                    $movie->setImagePath($newFilenamePoster);
+                    $movie->setPath($newFilenameMovie);
                 }
 
                 $entityManager->persist($movie);
