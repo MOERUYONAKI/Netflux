@@ -16,3 +16,38 @@ Avant de commencer, assurez-vous d'avoir installé les outils suivants :
 - Composer
 - Symfony CLI (facultatif, mais recommandé)
 - MariaDB ou un autre SGBD compatible
+
+## Installation
+
+1. **Clonez le dépôt** :
+   ```
+   git clone https://github.com/votre-nom-utilisateur/netflux.git  
+   cd netflux  
+   ```
+
+2. **Installez les dépendances** :
+   ```
+   composer install  
+   ```
+
+3. **Configurez la base de données** :
+   ```
+   DATABASE_URL="mysql://user:password@127.0.0.1:3306/netflux"  
+   ```
+
+4. **Créez la base de données et exécutez les migrations** :
+   ```
+   php bin/console doctrine:database:create  
+   php bin/console doctrine:migrations:migrate  
+   ```
+
+5. **Installez les assets** :
+   ```
+   npm install  
+   npm run build  
+   ```
+
+6. **Démarrez le serveur** :
+   ```
+   symfony serve
+   ```
