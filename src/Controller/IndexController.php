@@ -6,6 +6,7 @@ use App\Entity\Movie;
 use App\Entity\User;
 use App\Form\MovieType;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,6 +54,9 @@ class IndexController extends AbstractController
         return $this->redirectToRoute('app_register');
     }
 
+    /**
+     * @throws Exception
+     */
     #[Route('/new', name: 'add')]
     public function new(
         Request $request,
@@ -86,6 +90,10 @@ class IndexController extends AbstractController
                 }
 
                 if ($movieFile) {
+                    if (!in_array($movieFile->guessExtension(), ['mp4'])) {
+                        throw new Exception('Invalid file type.');
+                    }
+
                     $originalFilename = pathinfo($posterFile->getClientOriginalName(), PATHINFO_FILENAME);
                     $safeFilename = $slugger->slug($originalFilename);
                     $newFilename = $safeFilename.'-'.uniqid().'.'.$posterFile->guessExtension();
