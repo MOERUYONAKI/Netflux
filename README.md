@@ -14,7 +14,7 @@ Avant de commencer, assurez-vous d'avoir installé les outils suivants :
 
 - PHP >= 8.0
 - Composer
-- Symfony CLI (facultatif, mais recommandé)
+- Symfony CLI
 - MariaDB ou un autre SGBD compatible
 
 ## Installation
