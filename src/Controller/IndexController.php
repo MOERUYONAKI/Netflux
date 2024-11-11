@@ -22,23 +22,31 @@ class IndexController extends AbstractController
         Session $session
     ): Response
     {
-        if($session->has('user'))
-        {
-            $movies = $entityManager->getRepository(Movie::class)->findAll();
-            $user = $entityManager->getRepository(User::class)->find($session->get('user')->getId());
-            $admin = 0;
+//        if($session->has('user'))
+//        {
+//            $movies = $entityManager->getRepository(Movie::class)->findAll();
+//            $user = $entityManager->getRepository(User::class)->find($session->get('user')->getId());
+//            $admin = 0;
+//
+//            if ($user->isAdmin()) {
+//                $admin = 1;
+//            }
+//
+//            return $this->render('Page/index.html.twig', [
+//                'films' => $movies,
+//                'admin' => $admin
+//            ]);
+//        } else {
+//            return $this->redirectToRoute('app_register');
+//        }
 
-            if ($user->isAdmin()) {
-                $admin = 1;
-            }
+        $movies = $entityManager->getRepository(Movie::class)->findAll();
+        $admin = 0;
 
-            return $this->render('Page/index.html.twig', [
-                'films' => $movies,
-                'admin' => $admin
-            ]);
-        } else {
-            return $this->redirectToRoute('app_register');
-        }
+        return $this->render('Page/index.html.twig', [
+            'films' => $movies,
+            'admin' => $admin
+        ]);
     }
 
     #[Route('/signout', name: 'signout')]

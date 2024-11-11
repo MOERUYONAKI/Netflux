@@ -6,7 +6,6 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session:
         cookie_secure: auto
-        http_method_override: true
 
     #esi: true
     #fragments: true
