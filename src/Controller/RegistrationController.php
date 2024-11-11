@@ -26,36 +26,42 @@ class RegistrationController extends AbstractController
     #[Route('/login', name: 'login')]
     public function login(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
-        // Si le formulaire est soumis
-        if ($request->isMethod('POST')) {
-            $email = $request->request->get('email');
-            $password = $request->request->get('password');
+        // on vérifie si le user est déjà connecté
+        if ($request->getSession()->get('user')) {
+            return $this->redirectToRoute('index');
+        }
 
-            // cherche l'utilisateur par email
+        $error = null;
+        $lastUsername = '';
+
+        // on regarde la soumission du formulaire
+        if ($request->isMethod('POST')) {
+            $email = $request->request->get('_username');
+            $password = $request->request->get('_password');
+            $lastUsername = $email;
+
+            // on cherche l'utilisateur par email
             $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
 
             // je vérifie si l'utilisateur existe et si le mot de passe est correct
             if ($user && $passwordHasher->isPasswordValid($user, $password)) {
-                // stockage de l'utilisateur en session
+                // stockage du user en session
                 $session = $request->getSession();
                 $session->set('user', $user);
 
-                // redirection
+                // redirect vers la page d'accueil
                 return $this->redirectToRoute('index');
             }
 
-            // error d'authentification
-            $error = 'Email ou mot de passe invalide';
-            return $this->render('Registration/signin.html.twig', [
-                'error' => $error
-            ]);
+            // authentification error
+            $error = ['messageKey' => 'Invalid credentials', 'messageData' => []];
         }
 
-        // formulaire de connexion
-        return $this->render('Registration/signin.html.twig');
+        return $this->render('Registration/login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error
+        ]);
     }
-
-
 
     #[Route('/signin', name: 'app_register')]
     public function register(
