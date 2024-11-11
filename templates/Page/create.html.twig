@@ -1,0 +1,47 @@
+{% extends 'Layout/base.html.twig' %}
+
+{% block title %}Register{% endblock title %}
+
+{% block body %}
+    <div data-bs-theme="light">
+        <div class="bg-body d-flex text-center justify-content-center align-items-center min-vh-100">
+            {{ form_start(form, { 'attr': {'class': 'form w-25 pb-5 mb-5'} }) }}
+
+            <h1 class="pb-4">Add a movie</h1>
+
+            <div class="input-group mb-3">
+                {{ form_widget(form.title, {'attr': {'class': 'form-control', 'placeholder': 'Enter a title'}}) }}
+            </div>
+
+            <div class="input-group mb-3">
+                {{ form_widget(form.release_date, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="input-group mb-3">
+                {{ form_widget(form.director, {'attr': {'class': 'form-control', 'placeholder': 'Enter a director'}}) }}
+            </div>
+
+            <div class="input-group mb-3">
+                {{ form_widget(form.genre, {'attr': {'class': 'form-control', 'placeholder': 'Enter a genre'}}) }}
+            </div>
+
+            <div class="input-group mb-3">
+                {{ form_widget(form.length, {'attr': {'class': 'form-control', 'placeholder': 'Enter a length'}}) }}
+            </div>
+
+            <div class="input-group mb-3">
+                {{ form_widget(form.poster, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="input-group mb-3">
+                {{ form_widget(form.movie, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-outline-danger">Register</button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock body %}
