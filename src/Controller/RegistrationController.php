@@ -63,6 +63,19 @@ class RegistrationController extends AbstractController
         ]);
     }
 
+    #[Route('/logout', name: 'logout')]
+    public function connexion(
+        Session $session
+    ): Response
+    {
+        if($session->has('user'))
+        {
+            $session->remove('user');
+        }
+
+        return $this->redirectToRoute('app_register');
+    }
+
     #[Route('/signin', name: 'app_register')]
     public function register(
         Request $request,
@@ -87,14 +100,14 @@ class RegistrationController extends AbstractController
 
             $session->set('user', $user);
 
-//            // generate a signed url and email it to the user
-//            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-//                (new TemplatedEmail())
-//                    ->from(new Address('mailer@moeru.com', 'Netflux Bot'))
-//                    ->to((string) $user->getEmail())
-//                    ->subject('Please Confirm your Email')
-//                    ->htmlTemplate('Registration/confirmation_email.html.twig')
-//            );
+            // generate a signed url and email it to the user
+            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+                (new TemplatedEmail())
+                    ->from(new Address('mailer@moeru.com', 'Netflux Bot'))
+                    ->to((string) $user->getEmail())
+                    ->subject('Please Confirm your Email')
+                    ->htmlTemplate('Registration/confirmation_email.html.twig')
+            );
 
             return $this->redirectToRoute('index');
         }

@@ -39,6 +39,8 @@ security:
         - { path: '^/new', roles: 'ROLE_ADMIN' }
         - { path: '^/', roles: 'ROLE_USER' }
         - { path: '^/login', roles: 'PUBLIC_ACCESS' }
+        - { path: '^/signin', roles: 'PUBLIC_ACCESS' }
+        - { path: '^/signout', roles: 'PUBLIC_ACCESS' }
 
 when@test:
     security:
