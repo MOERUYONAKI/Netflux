@@ -23,7 +23,7 @@ class IndexController extends AbstractController
         Session $session
     ): Response
     {
-        if($session->has('user'))
+        if($session->has('user') && $this->userIsVerified($entityManager, $session->get('user')))
         {
             $movies = $entityManager->getRepository(Movie::class)->findAll();
             $user = $entityManager->getRepository(User::class)->find($session->get('user')->getId());
@@ -115,7 +115,7 @@ class IndexController extends AbstractController
         int $id
     ): Response
     {
-        if($session->has('user'))
+        if($session->has('user') && $this->userIsVerified($entityManager, $session->get('user')))
         {
             $movie = $entityManager->getRepository(Movie::class)->find($id);
 
@@ -125,5 +125,34 @@ class IndexController extends AbstractController
         } else {
             return $this->redirectToRoute('app_register');
         }
+    }
+
+    #[Route('/confirm', name: 'confirm')]
+    public function confirm(
+        EntityManagerInterface $entityManager,
+        Session $session
+    ): Response
+    {
+        if ($session->has('user')) {
+            $user = $entityManager->getRepository(User::class)->find($session->get('user')->getId());
+
+            if ($user->isVerified()) {
+                return $this->redirectToRoute('index');
+            } else {
+                return $this->render('Registration/waiting.html.twig');
+            }
+        }
+
+        return $this->redirectToRoute('signin');
+    }
+
+    public function userIsVerified(
+        EntityManagerInterface $entityManager,
+        User $user
+    ): bool
+    {
+        $userFromDB = $entityManager->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
+
+        return $userFromDB->isVerified();
     }
 }

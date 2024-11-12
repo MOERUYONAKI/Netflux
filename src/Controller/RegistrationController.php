@@ -109,7 +109,7 @@ class RegistrationController extends AbstractController
                     ->htmlTemplate('Registration/confirmation_email.html.twig')
             );
 
-            return $this->redirectToRoute('index');
+            return $this->redirectToRoute('confirm');
         }
 
         return $this->render('Registration/signin.html.twig', [
@@ -118,14 +118,15 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/verify/email', name: 'app_verify_email')]
-    public function verifyUserEmail(Request $request): Response
+    public function verifyUserEmail(
+        Request $request,
+        Session $session
+    ): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         // validate email confirmation link, sets User::isVerified=true and persists
         try {
             /** @var User $user */
-            $user = $this->getUser();
+            $user = $session->get('user');
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {
             $this->addFlash('verify_email_error', $exception->getReason());
