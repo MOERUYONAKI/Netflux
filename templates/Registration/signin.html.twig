@@ -1,0 +1,45 @@
+{% extends 'Layout/base.html.twig' %}
+
+{% block title %}Register{% endblock title %}
+
+{% block body %}
+    <div data-bs-theme="light">
+        <div class="bg-body d-flex text-center justify-content-center align-items-center min-vh-100">
+            {% for flash_error in app.flashes('verify_email_error') %}
+                <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+            {% endfor %}
+
+            {{ form_errors(registrationForm) }}
+
+            {{ form_start(registrationForm, { 'attr': {'class': 'form w-25 pb-5 mb-5'} }) }}
+
+            <h1 class="pb-4">Register</h1>
+
+            <div class="input-group mb-3">
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Enter your email'}}) }}
+            </div>
+
+            <div class="input-group mb-3">
+                {{ form_widget(registrationForm.plainPassword, {
+                    'attr': {'class': 'form-control', 'placeholder': 'Enter your password'},
+                    'label': 'Password'
+                }) }}
+            </div>
+
+            <div class="form-check mb-3 d-flex justify-content-center">
+                {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input mx-1'}}) }}
+                {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label mx-2'}}) }}
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-outline-danger">Sign in</button>
+            </div>
+
+            <div class="mb-3">
+                <a href="{{ path("login") }}"><small>Already registered</small></a>
+            </div>
+
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+{% endblock body %}
