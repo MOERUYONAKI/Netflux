@@ -71,6 +71,7 @@ DATABASE_URL="mysql://<utilisateur>:<mot_de_passe>@127.0.0.1:3306/netflux"
 Créez la base de données et appliquez les migrations :
 ```bash
 php bin/console doctrine:database:create
+php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 ```
 
