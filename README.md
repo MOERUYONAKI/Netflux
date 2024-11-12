@@ -132,7 +132,7 @@ Pour contribuer au projet :
 
 Exécutez les tests unitaires pour vérifier le bon fonctionnement de l'application :
 ```bash
-php bin/console test
+php bin/phpunit tests
 ```
 
 ---
